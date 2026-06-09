@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contexto - KI Text-Plattform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Contexto</h1>
+            <p>Intelligente Textanalyse & Übersetzung</p>
+        </header>
+
+        <main>
+            <div class="card input-section">
+                <textarea id="text-input" placeholder="Füge hier deinen Text ein oder tippe los..."></textarea>
+                
+                <div class="controls">
+                    <div class="dropdown-group">
+                        <label for="language-select">Ziel-Sprache:</label>
+                        <select id="language-select" class="dropdown">
+                            <option value="English">Englisch (English)</option>
+                            <option value="Spanish">Spanisch (Español)</option>
+                            <option value="Mandarin Chinese">Chinesisch / Mandarin (中文)</option>
+                            <option value="Hindi">Hindi (हिन्दी)</option>
+                            <option value="Arabic">Arabisch (العربية)</option>
+                            <option value="Portuguese">Portugiesisch (Português)</option>
+                            <option value="Bengali">Bengali (বাংলা)</option>
+                            <option value="Russian">Russisch (Русский)</option>
+                            <option value="Japanese">Japanisch (日本語)</option>
+                            <option value="Punjabi">Panjabi (ਪੰਜਾਬੀ)</option>
+                            <option value="German">Deutsch (Deutsch)</option>
+                            <option value="Javanese">Javanisch (Wong Jawa)</option>
+                            <option value="Wu Chinese">Wu-Chinesisch (吴语)</option>
+                            <option value="Malay/Indonesian">Malaiisch / Indonesisch (Bahasa)</option>
+                            <option value="Telugu">Telugu (తెలుగు)</option>
+                            <option value="Vietnamese">Vietnamesisch (Tiếng Việt)</option>
+                            <option value="Korean">Koreanisch (한국어)</option>
+                            <option value="French">Französisch (Français)</option>
+                            <option value="Marathi">Marathi (मраठी)</option>
+                            <option value="Tamil">Tamil (தமிழ்)</option>
+                            <option value="Turkish">Türkisch (Türkçe)</option>
+                            <option value="Urdu">Urdu (اُردُو)</option>
+                            <option value="Italian">Italienisch (Italiano)</option>
+                            <option value="Yue Chinese/Cantonese">Kantonesisch (粵語)</option>
+                            <option value="Persian/Farsi">Persisch / Farsi (فارسی)</option>
+                        </select>
+                    </div>
+
+                    <button id="translate-btn" class="btn btn-primary">Übersetzen</button>
+                </div>
+            </div>
+
+            <div class="card output-section">
+                <div class="output-header">
+                    <h3>Ergebnis:</h3>
+                    <div id="loading-spinner" class="spinner hidden"></div>
+                </div>
+                <div id="text-output" class="output-box">Dein Ergebnis erscheint hier...</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('translate-btn').addEventListener('click', async () => {
+            const textInput = document.getElementById('text-input').value.trim();
+            const selectedLanguage = document.getElementById('language-select').value;
+            const outputBox = document.getElementById('text-output');
+            const spinner = document.getElementById('loading-spinner');
+
+            // CREDIT-SCHUTZ: Verhindert leere oder extrem kurze Klicks vor dem API-Call
+            if (!textInput || textInput.length < 3) {
+                alert("Bitte gib einen gültigen Text ein (mindestens 3 Zeichen), bevor du übersetzt!");
+                return; 
+            }
+
+            spinner.classList.remove('hidden');
+            outputBox.innerText = "Übersetzung läuft...";
+
+            try {
+                const response = await fetch('/.netlify/functions/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: textInput,
+                        language: selectedLanguage
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Fehler bei der API-Abfrage.");
+                }
+
+                const data = await response.json();
+                outputBox.innerText = data.translation;
+
+            } catch (error) {
+                console.error(error);
+                outputBox.innerText = "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
+            } finally {
+                spinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
