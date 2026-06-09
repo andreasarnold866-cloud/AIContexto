@@ -3,108 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contexto - KI Text-Plattform</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Contexto – KI-gestützte Textanalyse-Plattform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --bg2: #121218;
+            --bg3: #1c1c24;
+            --text: #f3f4f6;
+            --text2: #9ca3af;
+            --text3: #6b7280;
+            --border: #22222e;
+            --brand: #6366f1;       /* Das originale Violett */
+            --brand-hover: #4f46e5;
+            --green: #10b981;
+            --red: #ef4444;
+            --r: 12px;
+        }
+
+        body.dark-theme {
+            --bg: #0b0b0f;
+            --bg2: #121218;
+            --bg3: #1c1c24;
+            --text: #f3f4f6;
+            --text2: #9ca3af;
+            --text3: #6b7280;
+            --border: #22222e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.5; }
+
+        nav { display: flex; align-items: center; justify-content: center; height: 70px; border-bottom: 1px solid var(--border); background: rgba(11,11,15,0.8); backdrop-filter: blur(8px); position: sticky; top:0; z-index:100; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .nav-logo { font-family: 'DM Serif Display', serif; font-size: 24px; color: #fff; text-decoration: none; font-weight: bold; }
+        .nav-logo span { color: var(--brand); }
+        .nav-links { display: flex; list-style: none; gap: 24px; }
+        .nav-links a { color: var(--text2); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #fff; }
+
+        .theme-btn, .lang-select { background: var(--bg3); color: var(--text); border: 1px solid var(--border); padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; outline: none; }
+        .lang-select { color-scheme: dark; }
+
+        .hero { position: relative; padding: 100px 20px 60px 20px; text-align: center; max-width: 800px; margin: 0 auto; }
+        .hero-glow { position: absolute; width: 300px; height: 300px; background: rgba(99,102,241,0.15); filter: blur(80px); top: 20px; left: 50%; transform: translateX(-50%); z-index: -1; }
+        .hero-eyebrow { font-size: 13px; color: var(--text3); margin-bottom: 16px; display: inline-flex; align-items: center; gap: 6px; background: var(--bg2); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
+        .eyebrow-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+        .hero h1 { font-family: 'DM Serif Display', serif; font-size: 48px; line-height: 1.1; margin-bottom: 20px; color: #fff; }
+        .highlight-word { color: var(--brand); font-style: normal; }
+        .hero-sub { color: var(--text2); font-size: 16px; max-width: 600px; margin: 0 auto 30px auto; }
+        .hero-cta { background: var(--brand); color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-block; transition: background 0.2s; }
+        .hero-cta:hover { background: var(--brand-hover); }
+
+        .tool-section { padding: 40px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .tool-header { text-align: center; margin-bottom: 30px; }
+        .tool-header h2 { font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 8px; color: #fff; }
+        .tool-header p { color: var(--text2); font-size: 14px; }
+
+        .tool-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .tool-topbar { background: #161622; padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; }
+        .tb-dots { display: flex; gap: 6px; margin-right: 12px; }
+        .tb-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .tb-dot.r { background: #ff5f56; } .tb-dot.y { background: #ffbd2e; } .tb-dot.g { background: #27c93f; }
+        .tb-title { font-size: 12px; color: var(--text3); font-family: monospace; }
+
+        .tool-body { padding: 24px; }
+
+        .input-wrap { position: relative; margin-bottom: 20px; }
+        textarea.main { width: 100%; height: 180px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; color: var(--text); font-size: 15px; resize: none; outline: none; transition: border-color 0.2s; }
+        textarea.main:focus { border-color: var(--brand); }
+        .char-badge { position: absolute; bottom: 12px; right: 12px; font-size: 11px; color: var(--text3); background: var(--bg2); padding: 2px 8px; border-radius: 4px; }
+
+        .upload-zone { background: var(--bg3); border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin-bottom: 16px; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; transition: border 0.2s; }
+        .upload-zone input[type="file"] { display: none; }
+        .upload-text-main { font-size: 13px; color: var(--text2); }
+        .upload-zone:hover { border-color: var(--brand); }
+
+        .label-sm { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 10px; font-weight: bold; }
+        .modes-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+        .mode-btn { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); padding: 10px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .mode-btn:hover { color: #fff; border-color: var(--text3); }
+        .mode-btn.active { background: rgba(99,102,241,0.15); color: #c7d2fe; border-color: var(--brand); }
+
+        .run-row { display: flex; gap: 12px; margin-bottom: 16px; }
+        .run-btn { background: var(--brand); color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; flex: 1; transition: background 0.2s; }
+        .run-btn:hover { background: var(--brand-hover); }
+        .clear-btn { background: transparent; color: var(--text2); border: 1px solid var(--border); padding: 12px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .clear-btn:hover { color: #fff; background: var(--bg3); }
+
+        .ki-warning-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #d97706; background: rgba(217,119,6,0.1); border: 1px solid rgba(217,119,6,0.2); padding: 10px; border-radius: 6px; margin-bottom: 24px; }
+
+        .result-wrap { background: #0f0f15; border: 1px solid var(--border); border-radius: 8px; padding: 20px; display: none; }
+        .result-wrap.show { display: block; }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .result-header h3 { font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff; }
+        .copy-btn { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .copy-btn:hover { color: #fff; }
+        .result-text { font-size: 15px; color: var(--text); line-height: 1.6; }
+
+        .how-section { padding: 60px 20px; background: #09090d; border-top: 1px solid var(--border); }
+        .section-label { font-size: 12px; color: var(--brand); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: bold; }
+        .how-section h2 { text-align: center; font-family: 'DM Serif Display', serif; font-size: 32px; margin-bottom: 40px; color: #fff; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .step { background: var(--bg2); border: 1px solid var(--border); padding: 24px; border-radius: var(--r); position: relative; }
+        .step-num { position: absolute; top: 16px; right: 16px; font-size: 12px; color: var(--text3); background: var(--bg3); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .step-icon { font-size: 24px; margin-bottom: 12px; }
+        .step h3 { font-size: 16px; margin-bottom: 8px; color: #fff; }
+        .step p { font-size: 13px; color: var(--text2); }
+
+        footer { text-align: center; padding: 30px; font-size: 12px; color: var(--text3); border-top: 1px solid var(--border); background: var(--bg); }
+        .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
-<body>
-    <div class="app-container">
-        <header>
-            <h1>Contexto</h1>
-            <p>Intelligente Textanalyse & Übersetzung</p>
-        </header>
+<body class="dark-theme">
 
-        <main>
-            <div class="card input-section">
-                <textarea id="text-input" placeholder="Füge hier deinen Text ein oder tippe los..."></textarea>
-                
-                <div class="controls">
-                    <div class="dropdown-group">
-                        <label for="language-select">Ziel-Sprache:</label>
-                        <select id="language-select" class="dropdown">
-                            <option value="English">Englisch (English)</option>
-                            <option value="Spanish">Spanisch (Español)</option>
-                            <option value="Mandarin Chinese">Chinesisch / Mandarin (中文)</option>
-                            <option value="Hindi">Hindi (हिन्दी)</option>
-                            <option value="Arabic">Arabisch (العربية)</option>
-                            <option value="Portuguese">Portugiesisch (Português)</option>
-                            <option value="Bengali">Bengali (বাংলা)</option>
-                            <option value="Russian">Russisch (Русский)</option>
-                            <option value="Japanese">Japanisch (日本語)</option>
-                            <option value="Punjabi">Panjabi (ਪੰਜਾਬੀ)</option>
-                            <option value="German">Deutsch (Deutsch)</option>
-                            <option value="Javanese">Javanisch (Wong Jawa)</option>
-                            <option value="Wu Chinese">Wu-Chinesisch (吴语)</option>
-                            <option value="Malay/Indonesian">Malaiisch / Indonesisch (Bahasa)</option>
-                            <option value="Telugu">Telugu (తెలుగు)</option>
-                            <option value="Vietnamese">Vietnamesisch (Tiếng Việt)</option>
-                            <option value="Korean">Koreanisch (한국어)</option>
-                            <option value="French">Französisch (Français)</option>
-                            <option value="Marathi">Marathi (मраठी)</option>
-                            <option value="Tamil">Tamil (தமிழ்)</option>
-                            <option value="Turkish">Türkisch (Türkçe)</option>
-                            <option value="Urdu">Urdu (اُردُو)</option>
-                            <option value="Italian">Italienisch (Italiano)</option>
-                            <option value="Yue Chinese/Cantonese">Kantonesisch (粵語)</option>
-                            <option value="Persian/Farsi">Persisch / Farsi (فارسی)</option>
-                        </select>
-                    </div>
-
-                    <button id="translate-btn" class="btn btn-primary">Übersetzen</button>
-                </div>
-            </div>
-
-            <div class="card output-section">
-                <div class="output-header">
-                    <h3>Ergebnis:</h3>
-                    <div id="loading-spinner" class="spinner hidden"></div>
-                </div>
-                <div id="text-output" class="output-box">Dein Ergebnis erscheint hier...</div>
-            </div>
-        </main>
+<nav>
+    <div class="nav-container">
+        <a href="#" class="nav-logo">Context<span>o</span></a>
+        <ul class="nav-links">
+            <li><a href="#tool" data-i18n="nav_tool">Analyse-Tool</a></li>
+            <li><a href="#wie" data-i18n="nav_how">Funktionsweise</a></li>
+        </ul>
+        <div class="nav-right" style="display: flex; align-items: center; gap: 12px;">
+            <select class="lang-select" id="langSelect">
+                <option value="de-DE">Deutsch (DE)</option>
+                <option value="en-US">English (US)</option>
+                <option value="fr-FR">Français (FR)</option>
+                <option value="es-ES">Español (ES)</option>
+            </select>
+            <button id="themeToggle" class="theme-btn">🌙 <span data-i18n="btn_dark">Dark Mode</span></button>
+        </div>
     </div>
+</nav>
 
-    <script>
-        document.getElementById('translate-btn').addEventListener('click', async () => {
-            const textInput = document.getElementById('text-input').value.trim();
-            const selectedLanguage = document.getElementById('language-select').value;
-            const outputBox = document.getElementById('text-output');
-            const spinner = document.getElementById('loading-spinner');
+<section class="hero">
+    <div class="hero-glow"></div>
+    <p class="hero-eyebrow"><span class="eyebrow-dot"></span> Powered by Netlify Functions & OpenRouter</p>
+    <h1 data-i18n="hero_title">Texte intelligent <em class="highlight-word">verstehen</em> und bearbeiten</h1>
+    <p class="hero-sub" data-i18n="hero_sub">Contexto filtert Kernpunkte, korrigiert Grammatik, übersetzt Sprachen, schreibt Texte professionell um und analysiert Dokumente.</p>
+    <a href="#tool" class="hero-cta" data-i18n="hero_cta">Jetzt testen</a>
+</section>
 
-            // CREDIT-SCHUTZ: Verhindert leere oder extrem kurze Klicks vor dem API-Call
-            if (!textInput || textInput.length < 3) {
-                alert("Bitte gib einen gültigen Text ein (mindestens 3 Zeichen), bevor du übersetzt!");
-                return; 
-            }
+<section class="tool-section" id="tool">
+    <div class="container">
+        <div class="tool-header">
+            <h2 data-i18n="tool_title">Die Analyse- & Übersetzungsplattform</h2>
+            <p data-i18n="tool_sub">Füge einen Text ein, lade eine Datei hoch oder wähle dein gewünschtes KI-Modul</p>
+        </div>
+        
+        <div class="tool-card">
+            <div class="tool-topbar">
+                <div class="tb-left">
+                    <div class="tb-dots"><div class="tb-dot r"></div><div class="tb-dot y"></div><div class="tb-dot g"></div></div>
+                    <span class="tb-title">contexto_secure_backend.js</span>
+                </div>
+            </div>
 
-            spinner.classList.remove('hidden');
-            outputBox.innerText = "Übersetzung läuft...";
+            <div class="tool-body">
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="fileInput" accept=".txt">
+                    <span class="upload-icon">📂</span>
+                    <span class="upload-text-main" data-i18n="upload_main">Klicke hier oder ziehe eine .txt-Datei hinein</span>
+                </div>
 
-            try {
-                const response = await fetch('/.netlify/functions/translate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        text: textInput,
-                        language: selectedLanguage
-                    })
-                });
+                <div class="input-wrap">
+                    <textarea class="main" id="inputText" placeholder="Schreibe oder füge hier deinen Text ein..."></textarea>
+                    <span class="char-badge" id="charCount">0 Zeichen</span>
+                </div>
 
-                if (!response.ok) {
-                    throw new Error("Fehler bei der API-Abfrage.");
-                }
+                <div id="translatorOptions" style="display: none; margin-bottom: 1.5rem; background: var(--bg3); padding: 12px; border-radius: var(--r); border: 1px solid var(--border);">
+                    <span class="label-sm" style="margin-bottom: 6px; display: block;" data-i18n="trans_label">Ziel-Sprache für Übersetzung:</span>
+                    <select id="targetLangSelect" style="background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; color-scheme: dark;">
+                        <option value="Englisch">English</option>
+                        <option value="Deutsch">Deutsch</option>
+                        <option value="Französisch">Français</option>
+                        <option value="Spanisch">Español</option>
+                        <option value="Italienisch">Italiano</option>
+                    </select>
+                </div>
 
-                const data = await response.json();
-                outputBox.innerText = data.translation;
+                <div class="label-sm" data-i18n="modules_label">ANALYSE-MODUL:</div>
+                <div class="modes-row" id="modes">
+                    <button class="mode-btn active" data-mode="summary" data-i18n="mod_summary">📄 Zusammenfassung</button>
+                    <button class="mode-btn" data-mode="explain" data-i18n="mod_explain">💡 Einfach Erklären</button>
+                    <button class="mode-btn" data-mode="rephrase_pro" data-i18n="mod_pro">💼 Profi-Stil umschreiben</button>
+                    <button class="mode-btn" data-mode="rephrase_points" data-i18n="mod_points">📌 In Stichpunkte wandeln</button>
+                    <button class="mode-btn" data-mode="grammar" data-i18n="mod_grammar">✏️ Grammatik-Check</button>
+                    <button class="mode-btn" data-mode="translate" data-i18n="mod_translate">🌐 Übersetzer</button>
+                    <button class="mode-btn" data-mode="stats" data-i18n="mod_stats">📊 Text-Metriken</button>
+                </div>
 
-            } catch (error) {
-                console.error(error);
-                outputBox.innerText = "Ein Fehler ist aufgetreten. Bitte versuche es erneut.";
-            } finally {
-                spinner.classList.add('hidden');
-            }
-        });
-    </script>
+                <div class="run-row">
+                    <button class="run-btn" id="runBtn" onclick="analyze()" data-i18n="btn_run">Analyse ausführen</button>
+                    <button class="clear-btn" onclick="clearAll()" data-i18n="btn_clear">Zurücksetzen</button>
+                </div>
+
+                <div class="ki-warning-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span data-i18n="ki_warning">KI kann Fehler machen. Überprüfe wichtige Antworten und Resultate sorgfältig.</span>
+                </div>
+
+                <div class="result-wrap" id="resultWrap">
+                    <div class="result-header">
+                        <h3 id="resultTitle" data-i18n="res_title">Ergebnis</h3>
+                        <span class="result-tag" id="resultTag" style="display:none"></span>
+                        <button class="copy-btn" id="copyBtn" onclick="copyResult()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            <span data-i18n="btn_copy">Kopieren</span>
+                        </button>
+                    </div>
+                    <div id="loadingIndicator" style="display: none; flex-direction: column; align-items: center; padding: 20px 10px; gap: 12px;">
+                        <div class="spinner"></div>
+                        <div style="font-size: 14px; color: var(--text2);" data-i18n="loading_text">KI analysiert Daten...</div>
+                    </div>
+                    <div id="resultBody"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="how-section" id="wie">
+    <div class="container">
+        <p class="section-label" style="text-align:center" data-i18n="pipe_label">Sichere Architektur</p>
+        <h2 data-i18n="pipe_title">Pipeline der Datenverarbeitung</h2>
+        
+        <div class="steps">
+            <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-icon">📋</div>
+                <h3 data-i18n="step1_title">Frontend Input</h3>
+                <p data-i18n="step1_desc">Der Benutzer fügt den Text ein oder lädt eine Datei.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-icon">🔒</div>
+                <h3 data-i18n="step2_title">Netlify Function</h3>
+                <p data-i18n="step2_desc">Die Daten wandern ans Backend. Der API-Key ist auf dem Server verborgen.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-icon">🤖</div>
+                <h3 data-i18n="step3_title">Inferenz</h3>
+                <p data-i18n="step3_desc">Das Sprachmodell verarbeitet den Text über OpenRouter.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">4</span>
+                <div class="step-icon">✨</div>
+                <h3 data-i18n="step4_title">DOM Injection</h3>
+                <p data-i18n="step4_desc">Das Ergebnis wandert zurück ans Frontend.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>Contexto · Projektarbeit Informatik · Sicher gehostet via Netlify</p>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
