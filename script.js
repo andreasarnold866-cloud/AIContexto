@@ -20,8 +20,7 @@ const TRANSLATIONS = {
         step4_title: 'DOM Injection', step4_desc: 'Das Ergebnis wandert zurück ans Frontend und wird über JavaScript flüssig eingeblendet.',
         char_unit: ' Zeichen', word_unit: 'Wörter', sentence_unit: 'Sätze', time_unit: 'ca. {sec} Sek.',
         grammar_ok: '🎉 Keine Fehler gefunden! Grammatik und Rechtschreibung sind einwandfrei.',
-        grammar_hint: 'Folgende Korrekturhinweise wurden gefunden:', conn_err: 'Fehler bei der Server-Verbindung.',
-        btn_dictate: 'Diktieren', btn_speak: 'Vorlesen', btn_download: 'Download (.txt)'
+        grammar_hint: 'Folgende Korrekturhinweise wurden gefunden:', conn_err: 'Fehler bei der Server-Verbindung.'
     },
     'en-US': {
         nav_tool: 'Analysis Tool', nav_how: 'How it works', btn_dark: 'Dark Mode', btn_light: 'Light Mode',
@@ -43,8 +42,7 @@ const TRANSLATIONS = {
         step4_title: 'DOM Injection', step4_desc: 'The result is sent back to the frontend and smoothly rendered into the document.',
         char_unit: ' characters', word_unit: 'Words', sentence_unit: 'Sentences', time_unit: 'approx. {sec} sec.',
         grammar_ok: '🎉 No errors found! Grammar and spelling are impeccable.',
-        grammar_hint: 'The following correction notes were found:', conn_err: 'Error connecting to the server.',
-        btn_dictate: 'Dictate', btn_speak: 'Speak', btn_download: 'Download (.txt)'
+        grammar_hint: 'The following correction notes were found:', conn_err: 'Error connecting to the server.'
     },
     'fr-FR': {
         nav_tool: 'Outil d\'analyse', nav_how: 'Fonctionnement', btn_dark: 'Mode Sombre', btn_light: 'Mode Clair',
@@ -66,8 +64,7 @@ const TRANSLATIONS = {
         step4_title: 'DOM Injection', step4_desc: 'Le résultat retourne au frontend et s\'affiche de manière fluide.',
         char_unit: ' caractères', word_unit: 'Mots', sentence_unit: 'Phrases', time_unit: 'env. {sec} sec.',
         grammar_ok: '🎉 Aucun défaut trouvé ! La grammaire et l\'orthographe sont impeccables.',
-        grammar_hint: 'Les suggestions de correction suivantes ont été trouvées :', conn_err: 'Erreur de connexion au serveur.',
-        btn_dictate: 'Dicter', btn_speak: 'Lire à haute voix', btn_download: 'Télécharger (.txt)'
+        grammar_hint: 'Les suggestions de correction suivantes ont été trouvées :', conn_err: 'Erreur de connexion au serveur.'
     },
     'es-ES': {
         nav_tool: 'Herramienta', nav_how: 'Cómo funciona', btn_dark: 'Modo Oscuro', btn_light: 'Modo Claro',
@@ -89,8 +86,7 @@ const TRANSLATIONS = {
         step4_title: 'DOM Injection', step4_desc: 'El resultado regresa al frontend y se despliega de manera fluida.',
         char_unit: ' caracteres', word_unit: 'Palabras', sentence_unit: 'Oraciones', time_unit: 'aprox. {sec} seg.',
         grammar_ok: '🎉 ¡No se encontraron errores! La gramática y la ortografía son impecables.',
-        grammar_hint: 'Se encontraron las siguientes notas de corrección:', conn_err: 'Error de conexión con el servidor.',
-        btn_dictate: 'Dictar', btn_speak: 'Escuchar', btn_download: 'Descargar (.txt)'
+        grammar_hint: 'Se encontraron las siguientes notas de corrección:', conn_err: 'Error de conexión con el servidor.'
     }
 };
 
@@ -101,7 +97,6 @@ const TITLES = {
 
 let activeMode = 'summary';
 let currentLang = 'de-DE';
-let latestRawResult = ''; // Speichert den rohen KI-Text für den Download
 
 const textarea = document.getElementById('inputText');
 const charCount = document.getElementById('charCount');
@@ -116,8 +111,6 @@ const uploadZone = document.getElementById('uploadZone');
 const loadingIndicator = document.getElementById('loadingIndicator');
 const themeToggle = document.getElementById('themeToggle');
 const langSelect = document.getElementById('langSelect');
-const downloadBtn = document.getElementById('downloadBtn');
-const speakBtn = document.getElementById('speakBtn');
 
 langSelect.addEventListener('change', (e) => {
     currentLang = e.target.value;
@@ -140,14 +133,11 @@ function translatePage(lang) {
         }
     });
     
-    charCount.textContent = textarea.value.trim().length + dict.char_unit;
-    
     if(resultWrap.classList.contains('show')) {
         resultTitle.textContent = dict[TITLES[activeMode]];
     }
 }
 
-// Echter Light / Dark Mode Toggle
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
@@ -156,7 +146,6 @@ themeToggle.addEventListener('click', () => {
     translatePage(currentLang);
 });
 
-// Datei-Eingabe über Upload-Zone
 uploadZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -176,7 +165,6 @@ textarea.addEventListener('input', () => {
     charCount.textContent = textarea.value.trim().length + TRANSLATIONS[currentLang].char_unit; 
 });
 
-// Modul-Wechsel Event-Listener
 document.getElementById('modes').addEventListener('click', e => {
     const b = e.target.closest('.mode-btn'); 
     if(!b) return;
@@ -195,19 +183,15 @@ function clearAll() {
     textarea.value = ''; 
     charCount.textContent = '0' + TRANSLATIONS[currentLang].char_unit;
     fileInput.value = '';
-    uploadZone.querySelector('.upload-text-main').textContent = TRANSLATIONS[currentLang].upload_main;
-    resultWrap.classList.remove('remove');
-    resultWrap.style.display = 'none';
+    uploadZone.querySelector('.upload-text-main').setAttribute('data-i18n', 'upload_main');
+    resultWrap.classList.remove('show'); 
     resultBody.innerHTML = ''; 
     resultTag.style.display = 'none';
     translatorOptions.style.display = 'none';
     loadingIndicator.style.display = 'none';
-    downloadBtn.style.display = 'none';
     document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
     document.querySelector('[data-mode="summary"]').classList.add('active');
     activeMode = 'summary';
-    latestRawResult = '';
-    window.speechSynthesis.cancel();
     translatePage(currentLang);
 }
 
@@ -221,62 +205,6 @@ function copyResult() {
         setTimeout(() => { btnText.textContent = oldText; }, 2000);
     });
 }
-
-// Spracheingabe (Speech-to-Text)
-const micBtn = document.getElementById('micBtn');
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'de-DE';
-    recognition.interimResults = false;
-
-    micBtn.addEventListener('click', () => {
-        recognition.start();
-        micBtn.style.borderColor = 'var(--red)';
-    });
-
-    recognition.onresult = function(event) {
-        const textToken = event.results[0][0].transcript;
-        textarea.value += (textarea.value ? " " : "") + textToken;
-        charCount.textContent = textarea.value.trim().length + TRANSLATIONS[currentLang].char_unit;
-        micBtn.style.borderColor = 'var(--border)';
-    };
-    recognition.onerror = () => { micBtn.style.borderColor = 'var(--border)'; };
-    recognition.onend = () => { micBtn.style.borderColor = 'var(--border)'; };
-} else {
-    micBtn.style.display = 'none';
-}
-
-// Sprachausgabe (Text-to-Speech)
-speakBtn.addEventListener('click', () => {
-    const cleanText = resultBody.innerText;
-    if (!cleanText) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    
-    // Automatische Sprachanpassung für flüssiges Vorlesen
-    if (activeMode === 'translate') {
-        const target = document.getElementById('targetLangSelect').value;
-        if(target === 'English') utterance.lang = 'en-US';
-        else if(target === 'Français') utterance.lang = 'fr-FR';
-        else if(target === 'Español') utterance.lang = 'es-ES';
-        else if(target === 'Italiano') utterance.lang = 'it-IT';
-        else utterance.lang = 'de-DE';
-    } else {
-        utterance.lang = currentLang;
-    }
-    window.speechSynthesis.speak(utterance);
-});
-
-// Download-Button Logik
-downloadBtn.addEventListener('click', () => {
-    if (!latestRawResult) return;
-    const blob = new Blob([latestRawResult], { type: 'text/plain;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = activeMode === 'translate' ? 'translation.txt' : 'corrected_text.txt';
-    link.click();
-});
 
 function getLocalStats(text) {
     const words = text.split(/\s+/).filter(x => x.length > 0).length;
@@ -299,15 +227,11 @@ async function analyze() {
     const dict = TRANSLATIONS[currentLang];
     runBtn.disabled = true;
     resultTag.style.display = 'none';
-    downloadBtn.style.display = 'none';
     resultTitle.textContent = dict[TITLES[activeMode]];
-    resultWrap.style.display = 'block';
     resultWrap.classList.add('show');
     
     loadingIndicator.style.display = 'flex';
     resultBody.innerHTML = '';
-    latestRawResult = '';
-    window.speechSynthesis.cancel();
     
     if(activeMode === 'stats') {
         loadingIndicator.style.display = 'none';
@@ -333,29 +257,23 @@ async function analyze() {
             
             if(matches.length === 0) {
                 resultBody.innerHTML = `<div class="grammar-ok" style="color:var(--green); font-weight:500;">${dict.grammar_ok}</div>`;
-                latestRawResult = dict.grammar_ok;
             } else {
-                downloadBtn.style.display = 'inline-flex'; // Download aktivieren
-                let html = `<div class="result-text" style="margin-bottom:15px; font-weight:500;">${dict.grammar_hint}</div>`;
-                let txtFileContent = dict.grammar_hint + "\n\n";
-                
+                let html = `<div class="result-text" style="margin-bottom:15px;">${dict.grammar_hint}</div>`;
                 matches.forEach(m => {
                     let falschesWort = text.substring(m.offset, m.offset + m.length);
                     let vorschlaege = m.replacements.slice(0, 3).map(r => r.value).join(', ') || '---';
-                    txtFileContent += `❌ ${falschesWort} -> ✅ ${vorschlaege} (${m.message})\n`;
                     html += `
-                        <div class="grammar-item" style="background:var(--bg2); border:1px solid var(--border); padding:12px; border-radius:var(--r); margin-bottom:10px;">
+                        <div class="grammar-item" style="background:var(--bg3); border:1px solid var(--border); padding:12px; border-radius:var(--r); margin-bottom:10px;">
                             <div class="grammar-diff" style="display:flex; gap:10px; align-items:center; margin-bottom:4px;">
-                                <span class="g-old" style="text-decoration:line-through; color:var(--red); font-weight:bold;">${falschesWort}</span>
+                                <span class="g-old" style="text-decoration:line-through; color:var(--red);">${falschesWort}</span>
                                 <span class="g-arrow" style="color:var(--text3);">→</span>
-                                <span class="g-new" style="color:var(--green); font-weight:bold;">${vorschlaege}</span>
+                                <span class="g-new" style="color:var(--green); font-weight:600;">${vorschlaege}</span>
                             </div>
                             <div class="g-explanation" style="font-size:13px; color:var(--text2);">${m.message}</div>
                         </div>
                     `;
                 });
                 resultBody.innerHTML = html;
-                latestRawResult = txtFileContent;
             }
         } catch(e) {
             loadingIndicator.style.display = 'none';
@@ -389,7 +307,7 @@ async function analyze() {
         } 
         else if (activeMode === 'translate') {
             const targetLang = document.getElementById('targetLangSelect').value;
-            textToSend = `Übersetze den folgenden Text präzise in die Sprache: ${targetLang}. Gib ausnahmslos nur die Übersetzung aus, keinerlei Metatext oder Kommentare:\n\nTEXT:\n${text}`;
+            textToSend = `Übersetze den folgenden Text präzise in die Sprache: ${targetLang}. Gib ausnahmslos nur die Übersetzung aus:\n\nTEXT:\n${text}`;
         }
 
         const response = await fetch("/.netlify/functions/chat", {
@@ -399,16 +317,10 @@ async function analyze() {
         });
 
         const data = await response.json();
-        loadingIndicator.style.display = 'none';
         
+        loadingIndicator.style.display = 'none';
         if (data.result) {
-            latestRawResult = data.result;
             resultBody.innerHTML = `<div class="result-text">${data.result.replace(/\n/g, '<br>')}</div>`;
-            
-            // Wenn übersetzt wurde, den Download-Button einblenden
-            if(activeMode === 'translate') {
-                downloadBtn.style.display = 'inline-flex';
-            }
         } else {
             throw new Error("Error");
         }
